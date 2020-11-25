@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+*,
+*::after,
+*::before {
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+}
