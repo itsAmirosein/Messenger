@@ -22,6 +22,7 @@ app.post("/getInfo", (req, res) => {
     JSON.stringify({
       name: user.name,
       id: user.id,
+      gender:user.gender,
       chats: user.chats,
     })
   );

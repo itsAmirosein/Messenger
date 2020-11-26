@@ -24,7 +24,8 @@ export default function MessegeView({
   deleteMessege,
   replyMessege,
   forwardMessege,
-  isOpen
+  isOpen,
+  gender
 }) {
   const chatRef = createRef();
   const [chatMenu, setChatMenu] = useState(false);
@@ -48,7 +49,7 @@ export default function MessegeView({
     <MessegeViewWrapper>
       <MessegeViewHeader>
         <ViewUserTitle>
-          <Avatar />
+          <Avatar gender={gender} />
           <ChatTitle>{title}</ChatTitle>
         </ViewUserTitle>
         <ChatHeaderToolWrapper>

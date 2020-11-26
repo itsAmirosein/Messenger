@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import ChatView from "./components/ChatView";
 
 import SidePanel from "./components/SidePanel";
@@ -11,8 +11,13 @@ import {
   UserTitle,
   Title,
 } from "./components/StyledComponents";
+import Context from "./components/Context";
 
 function App() {
+  // const [state, dispatch] = useReducer(reducer, {
+  //   showMessegeMenu: false,
+  //   isCollapse: false
+  // })
   const [id, setId] = useState(null);
   const [chat, setChat] = useState({});
   const [userMesseges, setUserMesseges] = useState({});
@@ -35,10 +40,11 @@ function App() {
   const handelClearHistory = () => {
     const copyUserMesseges = { ...userMesseges };
     copyUserMesseges.chats = [];
-    const copyUsers = [...users.allUsers];
-    const userFinde = { ...users.allUsers.find((item) => item.id === id) };
-    const userIndex = users.allUsers.findIndex((item) => item.id === id);
+    const copyUsers = [...users.filteredUsers];
+    const userFinde = { ...users.filteredUsers.find((item) => item.id === id) };
+    const userIndex = users.filteredUsers.findIndex((item) => item.id === id);
     userFinde.chats = [];
+    userFinde.chatsLength = 0
     copyUsers[userIndex] = userFinde;
 
     setUsers({
@@ -123,7 +129,6 @@ function App() {
   };
 
   const handelReplyMessege = (text, isOpponent, id) => {
-    console.log(id, "id");
     setReplay({
       text,
       isOpponent,
@@ -141,6 +146,7 @@ function App() {
 
   const handelClickForward = (id) => {
     setId(id);
+    console.log(userMesseges, 'usermessege after set id')
   };
 
   const onClick = (id) => {
@@ -153,8 +159,8 @@ function App() {
     userFinder.chatsLength = 0
     copyUsers[userIndex] = userFinder
     setUsers({
-      allUsers:users.allUsers,
-      filteredUsers:copyUsers
+      allUsers: users.allUsers,
+      filteredUsers: copyUsers
     })
     fetch("http://localhost:3001/getInfo", {
       method: "POST",
@@ -167,6 +173,7 @@ function App() {
       .then((res) => {
         setUserMesseges(res);
       });
+    console.log(userMesseges, 'usermessege after fetch')
   };
 
   const handelSearch = (val) => {
@@ -181,7 +188,8 @@ function App() {
   };
 
   const handelChat = (value) => {
-    let userchat = { ...users.allUsers[id - 1].chats };
+
+    let userchat = { ...userMesseges.chats[userMesseges.chats.length - 1] };
     const userId = ++userchat.id;
     setChat({
       id: userId,
@@ -195,8 +203,9 @@ function App() {
       replay: replay.text ? replay : {},
       isforwarded: forward.text ? { from: forward.from } : {},
     });
+
     setReplay({});
-    console.log(replay, "replay");
+    console.log(chat, 'asdasd')
   };
 
   useEffect(() => {
@@ -209,7 +218,6 @@ function App() {
               allUsers: Demo,
               filteredUsers: Demo,
             });
-            console.log("filtered Users", users.filteredUsers);
           }
         });
     } else if (forward.forwarded) {
@@ -218,15 +226,16 @@ function App() {
         text: forward.text,
         from: forward.from,
       });
-      handelChat(forward.text);
+      onClick(id);
+
+
+
     }
   }, [id]);
 
   useEffect(() => {
-    console.log(chat, "this is my pm");
     if (Object.getOwnPropertyNames(chat).length > 0) {
       if (!forward.text) {
-        console.log("fucking fetch");
         fetch("http://localhost:3001/add", {
           method: "POST",
           headers: {
@@ -234,10 +243,7 @@ function App() {
           },
           body: JSON.stringify({ chat, id }),
         })
-          .then((res) => res.json())
-          .then((res) => console.log("server res ", res));
 
-        console.log(users, "usersBefore");
         const userFinder = { ...users.filteredUsers.find((item) => item.id === id) };
         const userIndex = users.filteredUsers.findIndex((item) => item.id === id);
         const newUsers = [...users.filteredUsers];
@@ -245,7 +251,6 @@ function App() {
         newUsers.splice(userIndex, 1);
         newUsers.unshift(userFinder)
         setUsers({ allUsers: users.allUsers, filteredUsers: newUsers });
-        console.log(users, "users");
         setChat({});
         if (Object.getOwnPropertyNames(chat.isforwarded).length === 0) {
           const copyUserMesseges = { ...userMesseges };
@@ -255,27 +260,26 @@ function App() {
           setUserMesseges(copyUserMesseges);
         }
       }
-      if (forward.text) {
-        onClick(id);
-        console.log(id, "frw id");
-        console.log(userMesseges, "userfrwd meseg");
-      }
+
     }
   }, [chat, forward]);
 
   useEffect(() => {
     if (forward.text) {
-      const copyUserMesseges = { ...userMesseges };
-      const copyChats = [...copyUserMesseges.chats];
-      copyChats.push(chat);
-      copyUserMesseges.chats = copyChats;
-      console.log(copyUserMesseges, "cpuM");
-      setUserMesseges(copyUserMesseges);
-      setForward({
-        forwarded: false,
-        text: "",
-        from: "",
-      });
+      console.log(userMesseges,'usr')
+      handelChat(forward.text);
+      if (Object.getOwnPropertyNames(chat).length > 0) {
+        const copyUserMesseges = { ...userMesseges };
+        const copyChats = [...copyUserMesseges.chats];
+        copyChats.push(chat);
+        copyUserMesseges.chats = copyChats;
+        setUserMesseges(copyUserMesseges);
+        setForward({
+          forwarded: false,
+          text: "",
+          from: "",
+        });
+      }
     }
   }, [userMesseges]);
 

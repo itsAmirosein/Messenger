@@ -46,6 +46,7 @@ export default function ChatView({
           <MessegeView
             title={userMesseges.name}
             chats={userMesseges.chats}
+            gender={userMesseges.gender}
             clearHistory={clearHistory}
             deleteContact={deleteContact}
             SearchMesseges={() => setSearchMesseges(!searchMesseges)}

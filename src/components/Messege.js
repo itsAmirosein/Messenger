@@ -98,12 +98,12 @@ function Messege({
               )}
           </div>
           <MessegeTimer>{messegeTime}</MessegeTimer>
-          <MessegeMenu mode={isOpponent} show={showMessegeMenu}>
+          <MessegeMenu  show={showMessegeMenu}>
             <fa.FaChevronDown onClick={handelMessegeMenu} />
           </MessegeMenu>
           {/* {console.log(messageId,messegeMenuId,)} */}
           {messegeMenuId === messegeId && (
-            <MessegeMenuList out={messegeMenuId === messegeId} mode={isOpponent}>
+            <MessegeMenuList out={messegeMenuId === messegeId}>
               <Item onClick={deleteMessege}>Delete message</Item>
               <Item onClick={replyMessege}>Reply message</Item>
               <Item onClick={forwardMessege}>Forward message</Item>
