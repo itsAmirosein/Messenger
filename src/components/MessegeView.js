@@ -32,7 +32,7 @@ export default function MessegeView({
   const [menuFinder, setMenuFinder] = useState(0)
   useEffect(() => {
     chatRef.current.scrollTo(250, chatRef.current.scrollHeight);
-  }, [chatRef]);
+  }, [title]);
 
   useEffect(
     () =>
@@ -71,6 +71,7 @@ export default function MessegeView({
       <ChatPage ref={chatRef}>
         {chats.length > 0 &&
           chats.map((chat) => {
+            console.log(chat.id);
             return (
               <>
                 <Messege

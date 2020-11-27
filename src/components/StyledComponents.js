@@ -205,6 +205,7 @@ export const ChatPage = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   scroll-behavior: smooth;
+  padding-bottom:80px;
   &::-webkit-scrollbar {
     width: 10px;
   }
