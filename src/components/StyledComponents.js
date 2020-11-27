@@ -232,11 +232,12 @@ export const MessegeWrapper = styled.div`
   display: flex;
   width: 100%;
   max-width: 700px;
-  flex-direction: ${(props) => (props.isOpponent ? "row" : "row-reverse")};
+  flex-direction: row;
   position: relative;
   > div {
     font-size: 0.95rem;
   }
+
 `;
 
 export const ViewUserTitle = styled.div`
@@ -421,11 +422,11 @@ export const MessegeMenu = styled.span`
 
 export const fadeIn = keyframes`
   from {
-    height:0px;
+   opacity:0;
   }
 
   to {
-    height:100px;
+    opacity:1;
   }
 `;
 
@@ -634,7 +635,7 @@ export const UserWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 100%;
+  width:500px;
   height: 90px;
   background-color: white;
   border: 1px solid #e0e0e0;
@@ -663,13 +664,18 @@ export const Title = styled.div`
   padding: 1rem 14.6rem 1rem 1.5rem;
   border-radius: 7px 7px 0 0;
   color: #0f393f;
+  align-items:center;
+  width:500px;
+  svg{
+    margin-right:10px;
+    cursor:pointer;
+  }
 `;
 
 export const MessegeTimer = styled.span`
- color: #bbb;
-  font-size: 0.85rem;
-  align-items:center;
-  /* position:relative;
-  right:0px;
-  padding-left:10px; */
-`
+  color: #bbb;
+  font-size: 0.8rem;
+  align-items: center;
+  margin: 2px 3px 0 4px;
+
+`;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import {
   MessegeWrapper,
   MessegeMenu,
@@ -16,7 +16,7 @@ import {
   MessegeTimer,
 } from "./StyledComponents";
 import * as fa from "react-icons/fa";
-
+import reducer from "./reducer";
 function Messege({
   message,
   isOpponent,
@@ -29,38 +29,52 @@ function Messege({
   messegeTime,
   menuFinder,
   messegeId,
-  messegeMenuId
+  messegeMenuId,
 }) {
-  const [messegeMenu, setMessegeMenu] = useState(false);
-  const [showMessegeMenu, setShowMessegeMenu] = useState(false);
-  const [isCollapse, setIsCollapse] = useState(false);
+  const [{ showMessegeMenu, isCollapse }, dispatch] = useReducer(reducer, {
+    showMessegeMenu: false,
+    isCollapse: false,
+  });
+
   useEffect(() => {
     window.addEventListener("click", () => {
-    if(messegeMenuId>0){
-        menuFinder(0)
-    }
-      
+      if (messegeMenuId > 0) {
+        menuFinder(0);
+      }
     });
   });
 
   const handelMessegeMenu = (eve) => {
-    if(messegeMenuId !== messegeId){
-    menuFinder(messegeId)
-    }
-    else{
-      menuFinder(0)
+    if (messegeMenuId !== messegeId) {
+      menuFinder(messegeId);
+    } else {
+      menuFinder(0);
     }
     eve.stopPropagation();
   };
   const handleCollapse = () => {
-    setIsCollapse(true);
+    dispatch({
+      type: "SET_COLLAPSE",
+    });
+
+  };
+  const handleMouseOver = () => {
+    dispatch({
+      type: "MOUSE_OVER",
+    });
+  };
+  const handleMouseOut = () => {
+    dispatch({
+      type: "MOUSE_OUT",
+    });
   };
   return (
     <>
+    {/* {console.log(isforwarded,replay,'mmmasd')} */}
       <MessegeboxWrapper
         isOpponent={isOpponent}
-        onMouseOver={() => setShowMessegeMenu(true)}
-        onMouseOut={() => setShowMessegeMenu(false)}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
       >
         {Object.getOwnPropertyNames(replay).length > 0 && (
           <Replay isOpponent={isOpponent} rep={replay.isOpponent}>
@@ -91,11 +105,11 @@ function Messege({
                   <ReadMore onClick={handleCollapse}>Read more</ReadMore>
                 </div>
               ) : (
-                  message
-                )
-            ) : (
                 message
-              )}
+              )
+            ) : (
+              message
+            )}
           </div>
           <MessegeTimer>{messegeTime}</MessegeTimer>
           <MessegeMenu  show={showMessegeMenu}>
@@ -103,7 +117,10 @@ function Messege({
           </MessegeMenu>
           {/* {console.log(messageId,messegeMenuId,)} */}
           {messegeMenuId === messegeId && (
-            <MessegeMenuList out={messegeMenuId === messegeId}>
+            <MessegeMenuList
+              out={messegeMenuId === messegeId}
+              
+            >
               <Item onClick={deleteMessege}>Delete message</Item>
               <Item onClick={replyMessege}>Reply message</Item>
               <Item onClick={forwardMessege}>Forward message</Item>

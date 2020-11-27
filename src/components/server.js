@@ -24,6 +24,7 @@ app.post("/getInfo", (req, res) => {
       id: user.id,
       gender:user.gender,
       chats: user.chats,
+      
     })
   );
 });

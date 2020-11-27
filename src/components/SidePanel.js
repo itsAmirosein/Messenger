@@ -26,8 +26,7 @@ export default function SidePanel({ onClick, usersData, handelSearch }) {
         />
         {usersData.map((dataInfo) => {
           return (
-           usersData&& (
-             
+            usersData && (
               <Chat
                 key={dataInfo.id}
                 title={dataInfo.name}

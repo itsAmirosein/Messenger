@@ -1,6 +1,5 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import ChatView from "./components/ChatView";
-
 import SidePanel from "./components/SidePanel";
 import { Wrapper, Avatar, ChatLabel } from "./components/StyledComponents";
 import axios from "axios";
@@ -11,157 +10,113 @@ import {
   UserTitle,
   Title,
 } from "./components/StyledComponents";
-import Context from "./components/Context";
+import reducer from "./components/reducer";
 
 function App() {
-  // const [state, dispatch] = useReducer(reducer, {
-  //   showMessegeMenu: false,
-  //   isCollapse: false
-  // })
-  const [id, setId] = useState(null);
-  const [chat, setChat] = useState({});
-  const [userMesseges, setUserMesseges] = useState({});
-  const [users, setUsers] = useState({
-    allUsers: [],
-    filteredUsers: [],
-  });
-  const [replay, setReplay] = useState({
-    text: "",
-    isOpponent: false,
-    id: 0,
-  });
-
-  const [forward, setForward] = useState({
-    forwarded: false,
-    text: "",
-    from: "",
+  const [
+    { id, chat, userMesseges, users, forward },
+    dispatch,
+  ] = useReducer(reducer, {
+    id: null,
+    chat: {},
+    userMesseges: {},
+    users: {
+      allUsers: [],
+      filteredUsers: [],
+    },
+    replay: {
+      text: "",
+      isOpponent: false,
+      id: 0,
+    },
+    forward: {
+      forwarded: false,
+      text: "",
+      from: "",
+    },
   });
 
   const handelClearHistory = () => {
-    const copyUserMesseges = { ...userMesseges };
-    copyUserMesseges.chats = [];
-    const copyUsers = [...users.filteredUsers];
-    const userFinde = { ...users.filteredUsers.find((item) => item.id === id) };
-    const userIndex = users.filteredUsers.findIndex((item) => item.id === id);
-    userFinde.chats = [];
-    userFinde.chatsLength = 0
-    copyUsers[userIndex] = userFinde;
-
-    setUsers({
-      allUsers: users.allUsers,
-      filteredUsers: copyUsers,
+    dispatch({
+      type: "SET_USERS",
     });
-    setUserMesseges(copyUserMesseges);
+    dispatch({
+      type: "SET_USER_MESSAGES",
+    });
+
     axios.post("http://localhost:3001/clearHistory", {
       id,
     });
   };
 
   const handelDeleteContact = () => {
-    const copyUsers = [...users.filteredUsers];
-    const usersFiltere = copyUsers.filter((item) => item.id !== id);
-    setUsers({
-      allUsers: users.allUsers,
-      filteredUsers: usersFiltere,
+    dispatch({
+      type: "SET_DELETE_USERS",
     });
-    setUserMesseges({});
+
+    dispatch({
+      type: "DELETE_MESSAGES",
+
+    });
+
     axios.post("http://localhost:3001/deleteUser", {
       id,
     });
   };
 
   const handelDeleteMessege = (messegeId, isOpponent) => {
-    const copyUserMesseges = { ...userMesseges };
-    const messegeFinder = {
-      ...copyUserMesseges.chats.find((item) => item.id === messegeId),
-    };
-    const copyMesseges = [...copyUserMesseges.chats];
-    let copyItem = {};
-    copyMesseges.forEach((item) => {
-      if (
-        item.id !== messegeId &&
-        Object.getOwnPropertyNames(item.replay).length > 0
-      ) {
-        if (item.replay.id === messegeId) {
-          copyItem = { ...item };
-          const copyReplay = { ...item.replay };
-
-          copyReplay.text = isOpponent
-            ? "This message was deleted"
-            : "You delete this message";
-          copyItem.replay = copyReplay;
-          copyMesseges[item.id - 1] = copyItem;
-          copyUserMesseges.chats = copyMesseges;
-        }
-      }
+    dispatch({
+      type: "DEL_MESSAGE",
+      payload: { messegeId, isOpponent },
     });
-
-    messegeFinder.messege = isOpponent
-      ? "This message was deleted"
-      : "You delete this message";
-    const messegeIndex = copyUserMesseges.chats.findIndex(
-      (item) => item.id === messegeId
-    );
-    copyUserMesseges.chats[messegeIndex] = messegeFinder;
-    console.log(copyUserMesseges, "copyusermessege");
-    setUserMesseges(copyUserMesseges);
-    if (messegeId === userMesseges.chats.length) {
-      const copyUsers = [...users.filteredUsers];
-      const messegeFinder = { ...copyUsers.find((item) => item.id === id) };
-      const userIndex = copyUsers.findIndex((item) => item.id === id);
-      const userMessege = { ...messegeFinder.chats };
-      userMessege.messege = isOpponent
-        ? "This message was deleted"
-        : "You delete this message";
-      messegeFinder.chats = userMessege;
-      copyUsers[userIndex] = messegeFinder;
-      setUsers({
-        allUsers: users.allUsers,
-        filteredUsers: copyUsers,
-      });
-      console.log(copyUsers, "all users");
-    }
-    axios.post("http://localhost:3001/deleteMessege", {
-      messegeId,
-      id,
-      item: copyItem,
+    dispatch({
+      type: "USER_FILTER",
+      payload: { messegeId, isOpponent },
     });
   };
 
   const handelReplyMessege = (text, isOpponent, id) => {
-    setReplay({
-      text,
-      isOpponent,
-      id,
+    dispatch({
+      type: "SET_REPLAY",
+      payload: {
+        text,
+        isOpponent,
+        id,
+      },
     });
   };
 
   const handelForward = (from, text) => {
-    setForward({
-      forwarded: true,
-      text,
-      from,
+    dispatch({
+      type: "SET_FORWARD",
+      payload: {
+        forwarded: true,
+        text,
+        from,
+      },
     });
   };
 
   const handelClickForward = (id) => {
-    setId(id);
-    console.log(userMesseges, 'usermessege after set id')
+    dispatch({
+      type: "SET_ID",
+      payload: id,
+    });
   };
 
   const onClick = (id) => {
     if (!forward.text) {
-      setId(id);
+      dispatch({
+        type: "SET_FORWARD_ID",
+        payload: id,
+      });
     }
-    const copyUsers = [...users.filteredUsers]
-    const userFinder = { ...users.filteredUsers.find(item => item.id === id) }
-    const userIndex = users.filteredUsers.findIndex(item => item.id === id)
-    userFinder.chatsLength = 0
-    copyUsers[userIndex] = userFinder
-    setUsers({
-      allUsers: users.allUsers,
-      filteredUsers: copyUsers
-    })
+
+    dispatch({
+      type: "USERS_FORWARD",
+      payload: id,
+    });
+
     fetch("http://localhost:3001/getInfo", {
       method: "POST",
       headers: {
@@ -171,41 +126,28 @@ function App() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setUserMesseges(res);
+        dispatch({
+          type: "FETCH_MESSAGES",
+          payload: res,
+        });
       });
-    console.log(userMesseges, 'usermessege after fetch')
   };
 
   const handelSearch = (val) => {
-    const copyUsers = [...users.allUsers];
-    const finde = copyUsers.filter((items) =>
-      items.name.toLowerCase().includes(val.toLowerCase())
-    );
-    setUsers({
-      ...users,
-      filteredUsers: finde,
+    dispatch({
+      type: "SEARCH_USERS",
+      payload: val,
     });
   };
 
   const handelChat = (value) => {
-
-    let userchat = { ...userMesseges.chats[userMesseges.chats.length - 1] };
-    const userId = ++userchat.id;
-    setChat({
-      id: userId,
-      messege: value,
-      isOpponent: false,
-      messegeTime: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
-      replay: replay.text ? replay : {},
-      isforwarded: forward.text ? { from: forward.from } : {},
+    dispatch({
+      type: "SET_CHAT",
+      payload: value,
     });
-
-    setReplay({});
-    console.log(chat, 'asdasd')
+    dispatch({
+      type: "SET_REPLAY_CHAT",
+    });
   };
 
   useEffect(() => {
@@ -214,22 +156,29 @@ function App() {
         .then((res) => res.json())
         .then((Demo) => {
           if (Demo) {
-            setUsers({
-              allUsers: Demo,
-              filteredUsers: Demo,
+            dispatch({
+              type: "SET_FETCH_DEMO",
+              payload: {
+                allUsers: Demo,
+                filteredUsers: Demo,
+              },
             });
+
+         
           }
         });
     } else if (forward.forwarded) {
-      setForward({
-        forwarded: false,
-        text: forward.text,
-        from: forward.from,
+      
+
+      dispatch({
+        type: "SET_DEMO_FORWARD",
+        payload: {
+          forwarded: false,
+          text: forward.text,
+          from: forward.from,
+        },
       });
       onClick(id);
-
-
-
     }
   }, [id]);
 
@@ -243,43 +192,45 @@ function App() {
           },
           body: JSON.stringify({ chat, id }),
         })
+        
 
-        const userFinder = { ...users.filteredUsers.find((item) => item.id === id) };
-        const userIndex = users.filteredUsers.findIndex((item) => item.id === id);
-        const newUsers = [...users.filteredUsers];
-        userFinder.chats = chat;
-        newUsers.splice(userIndex, 1);
-        newUsers.unshift(userFinder)
-        setUsers({ allUsers: users.allUsers, filteredUsers: newUsers });
-        setChat({});
+        dispatch({
+          type: "ADD_USER",
+          payload:chat
+        });
+
+        dispatch({
+          type: "REMOVE_CHAT",
+        });
+
         if (Object.getOwnPropertyNames(chat.isforwarded).length === 0) {
-          const copyUserMesseges = { ...userMesseges };
-          const copyChats = [...copyUserMesseges.chats];
-          copyChats.push(chat);
-          copyUserMesseges.chats = copyChats;
-          setUserMesseges(copyUserMesseges);
+          dispatch({
+            type: "USER_MESSEGES_FETCH_ADD",
+            payload:chat,
+          });
         }
       }
-
+      else {
+        dispatch({
+          type: "USER_MESSEGES_FORWARD_TEXT",
+        });
+  
+        dispatch({
+          type: "SET_FORWARD_TEXT",
+          payload: {
+            forwarded: false,
+            text: "",
+            from: "",
+          },
+        });
+      }
     }
   }, [chat, forward]);
 
   useEffect(() => {
     if (forward.text) {
-      console.log(userMesseges,'usr')
       handelChat(forward.text);
-      if (Object.getOwnPropertyNames(chat).length > 0) {
-        const copyUserMesseges = { ...userMesseges };
-        const copyChats = [...copyUserMesseges.chats];
-        copyChats.push(chat);
-        copyUserMesseges.chats = copyChats;
-        setUserMesseges(copyUserMesseges);
-        setForward({
-          forwarded: false,
-          text: "",
-          from: "",
-        });
-      }
+
     }
   }, [userMesseges]);
 
@@ -291,10 +242,13 @@ function App() {
             {" "}
             <fa.FaTimes
               onClick={() =>
-                setForward({
-                  forwarded: false,
-                  text: "",
-                  from: "",
+                dispatch({
+                  type: "SET_FORWARD_LIST_USERS",
+                  payload: {
+                    forwarded: false,
+                    text: "",
+                    from: "",
+                  },
                 })
               }
             />
@@ -303,7 +257,7 @@ function App() {
           <div>
             {users.allUsers.map((item) => (
               <UserWrapper onClick={() => handelClickForward(item.id)}>
-                <Avatar />
+                <Avatar gender={item.gender} />
                 <ChatLabel>
                   <UserTitle>{item.name}</UserTitle>
                 </ChatLabel>
@@ -329,6 +283,7 @@ function App() {
           deleteMessege={handelDeleteMessege}
           hadelReply={handelReplyMessege}
           forwardMessege={handelForward}
+          usersData={users.filteredUsers}
         />
       </Wrapper>
     </>
