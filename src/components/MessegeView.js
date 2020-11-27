@@ -7,7 +7,8 @@ import {
   MessegeViewHeader,
   MessegeViewWrapper,
   ViewUserTitle,
-  ManageMenuWrapper
+  ManageMenuWrapper,
+  Title
 } from "./StyledComponents";
 import * as fa from "react-icons/fa";
 import Messege from "./Messege";
@@ -32,7 +33,7 @@ export default function MessegeView({
   const [menuFinder, setMenuFinder] = useState(0)
   useEffect(() => {
     chatRef.current.scrollTo(250, chatRef.current.scrollHeight);
-  }, [chatRef]);
+  }, [SearchMesseges]);
 
   useEffect(
     () =>

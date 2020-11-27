@@ -275,6 +275,7 @@ function App() {
             handelSearch={handelSearch}
           />
         )}
+        {console.log(userMesseges,'amir')}
         <ChatView
           userMesseges={userMesseges}
           onSendMessege={handelChat}

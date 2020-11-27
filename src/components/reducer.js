@@ -84,23 +84,24 @@ export default function reducer(state, action) {
         userMesseges: copyUserMessegesDel,
       };
     case "USER_FILTER":
+      const copyUsersFiltered = [...users.filteredUsers];
       if (action.payload.messegeId === userMesseges.chats.length) {
-        const copyUsers = [...users.filteredUsers];
-        const messegeFinder = { ...copyUsers.find((item) => item.id === id) };
-        const userIndex = copyUsers.findIndex((item) => item.id === id);
+       
+        const messegeFinder = { ...copyUsersFiltered.find((item) => item.id === id) };
+        const userIndex = copyUsersFiltered.findIndex((item) => item.id === id);
         const userMessege = { ...messegeFinder.chats };
         userMessege.messege = action.payload.isOpponent
           ? "This message was deleted"
           : "You delete this message";
         messegeFinder.chats = userMessege;
-        copyUsers[userIndex] = messegeFinder;
+        copyUsersFiltered[userIndex] = messegeFinder;
       }
 
       return {
         ...state,
         users: {
           allUsers: users.allUsers,
-          filteredUsers: copyUsers,
+          filteredUsers: copyUsersFiltered,
         },
       };
     case "SET_REPLAY":

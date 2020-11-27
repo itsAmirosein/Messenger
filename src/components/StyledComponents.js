@@ -197,6 +197,7 @@ export const MessegeViewHeader = styled.div`
 `;
 export const ChatPage = styled.div`
   position: relative;
+  padding-bottom:80px;
   z-index: 1;
   width: 100%;
   height: 100%;
