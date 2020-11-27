@@ -32,7 +32,7 @@ export default function MessegeView({
   const [menuFinder, setMenuFinder] = useState(0)
   useEffect(() => {
     chatRef.current.scrollTo(250, chatRef.current.scrollHeight);
-  }, [title]);
+  }, [SearchMesseges]);
 
   useEffect(
     () =>
